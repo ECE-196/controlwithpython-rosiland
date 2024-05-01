@@ -1,5 +1,6 @@
 ### How does the DevBoard handle received serial messages? How does this differ from the naïve approach?
-
+The DevBoard handles received serial messages through an interrupt, or an event driven signal that runs code. In this assignment, the event ARDUINO_HW_CDC_RX_EVENT is triggered when a byte is received. This event calls a function that will consider each byte received to be the target LED state, checking that it is either LOW or HIGH, and updating the LED state based on that byte. Using an interrupt differs from the naive approach because rather than using an if block with Serial.available() and placing our function inside there, using an interrupt will allow code to run simultaneously. Bytes can be received simultaneously as the function is running, providing a faster response to the received serial messages.
 ### What does `detached_callback` do? What would happen if it wasn't used?
-
+A detached callback will spawn a detached thread for all registered callbacks. If it wasn't used, the UI will freeze whenever any serial code gets stuck or takes a long time.
 ### What does `LockedSerial` do? Why is it _necessary_?
+LockedSerial will wrap Serial in a lock. The LockedSerial class will inherit from the Serial class and thus behave exactly like the Serial class but it will have a lock around every member function call. It is necessary because with the detached callbacks, multiple threads could try to use the serial port at once, so having a lock around every member function of Serial will prevent undefined behavior.
